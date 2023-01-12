@@ -194,7 +194,8 @@ crudeIncidence<-function(pred,Districts,PrePost){
 
 # Summary {-}
 
-This appendix provides a comprehensive summary of the statistical analyses done on the demographics and malaria incidence data of Grande Comore Island. In section 1, we explore the demographics of Grande Comore Island, looking at gender and age categories distributions by district and treatment group to assess if districts are properly matched. In Section 2, we first undertake a model selection for the incidence data, which is followed by the analysis of malaria incidence rates by the selected model. In section 3, we use the same model to compare outcomes of our two-dose MDA on Grande Comore Island to the three-dose MDA on Anjouan Island from our previously published study.
+This appendix provides a comprehensive summary of the statistical analyses done on the demographics and population malaria incidence data as much as the analyses of parasitemia and gametocytemia in children on Grande Comore Island. In section 1, we explore the demographics of Grande Comore Island, looking at gender and age categories distributions by district and treatment group to assess if districts are properly matched. In Section 2, we first undertake a model selection for the incidence data, which is followed by the analysis of malaria incidence rates by the selected model. In section 3, we use the same model to compare outcomes of our two-dose MDA on Grande Comore Island to the three-dose MDA on Anjouan Island from our previously published study. Ultimately, in section 4, we look at the prevalence of parasitemia and gametocytemia in children younger than 10 years of age, as they are a particularly vulnerable group and constitute the largest proportion of residence on the island of Grande Comore.
+
 
 # Demographic analysis of Grande Comore Island, Union of Comoros
 
@@ -235,6 +236,7 @@ Dat2 <- Dat1[rep(row.names(Dat1), Dat1$Population), colnames(Dat1[, !names(Dat1)
 ```
 
 In this study, mass drug administration (MDA) consisting of two rounds of either artemisinin-piperaquine (AP) only or AP + low dose primaquine (AP+PMQ~LD~) was administered to the regionally limited population of Grande Comore Island, Union of Comoros, in the efforts of malaria elimination. According to the pre-MDA survey, Grande Comore Island has a total population of `r formatC(sum(Dat1$Population), format="d", big.mark=",")` and in seven districts (`r str_to_title(paste0(sort(levels(Dat1$District)), collapse = ", "))`), of which Centre contains the capital and `r round(sum(Dat1[which(Dat1$District == "CENTRE"),]$Population) * 100 / sum(Dat1$Population), 2)`% of the island's population (`r formatC(sum(Dat1[which(Dat1$District == "CENTRE"),]$Population), format="d", big.mark=",")`). Whole districts were assigned to one of the two treatment groups: Centre, Hamahamet, Hambou, and Oichili to AP treatment and Mbadjini-Est, Mbadjini-Ouest, and Mitsamiouli to AP+PMQ~LD~ treatment. To establish statistically valid comparability between the two treatment groups, we assessed the population distribution by regression analysis, looking at population gender and age distribution by i) district, and ii) treatment group, using binomial regression and ordinal regression, respectively.
+
 
 ## Analysis of gender ratio Grande Comore Island, Union of Comoros
 
@@ -291,8 +293,6 @@ summary(LinMod2)
 
 Excluding Centre from the AP treatment group showed no significant difference for the interaction of Age and treatment group to explain gender ratios, suggesting that exclusion of Centre resulted in more balanced and comparable demographics with respect to gender distribution between the AP and AP+PMQ~LD~ treatment groups (Fig. 1C).
 
-## Analysis of population distribution by age category
-
 ```{r Sex-Ratio-analysis-by-Treatment-Group-(excluding-CENTRE), echo = FALSE, include = FALSE}
 # Exclude CENTRE from the analysis
 Dat4 <- Dat2[which(Dat2$District != "CENTRE"), ] %>% mutate_at("District", as.character) %>% mutate_at("District", as.factor)
@@ -310,6 +310,8 @@ summary(con3, infer = c(TRUE, TRUE))
 ```{r Included-Output-3, echo = FALSE, include = TRUE}
 summary(LinMod3)
 ```
+
+## Analysis of population distribution by age category
 
 ```{r Ordinal-regression-by-Age-against-District, echo = FALSE, include = FALSE, eval = TRUE}
 # # Ordinal regresison of Age as dependent variable with district as predictor
@@ -398,9 +400,10 @@ Dat5 <- bind_rows(lapply(Dat, function(y) {
   })) %>%
   mutate(Treatment = as.factor(if_else(District %in% c("CENTRE", "HAMBOU", "HAMAHAMET", "OICHILI"), "AP", "AP+PMQ")), .after = Age)
 ```
+
 ```{r Fig-3, echo = FALSE, include = TRUE, fig.height = 6, fig.width = 6,  fig.cap = "Graphical representation of total population by Age category within each District along the chronological order of age category"}
 # This graph shows the change in population by age group between districts to show trends of decay
-# png(filename="Total Pop by Age & Dis.jpeg", width=1200, height=1200)
+# png(filename="Total Pop by Age & Dis.jpeg", width=600, height=600)
 
 ggplot(data = Dat5, aes(x = Age, y = Total, group = District)) +
   geom_line(color = 'Blue', linewidth = 1) +
@@ -550,6 +553,7 @@ plot(s, which=1:9, pch=1:9, xlab='logit', main=' ', xlim=range(s[,3:10])) # Hmis
 
 The conclusion from this analysis was that the districts Hamahamet, Hambou, Mbadjini-Est, Mbadjini-Ouest, Mitsamiouli, and Oichili had comparable gender ratios and approximately similar population distributions by their age categories. The district of Centre was an outlier in the demographic analysis that could affect the comparability of treatment groups in demographic distribution. Accordingly, we proceeded with comparative analyses of our MDA results from the AP+PMQ~LD~-treated and AP-treated districts, including as well as excluding the data from Centre.
 
+
 # Statistical analysis of the malaria incidence data of Grande Comore Islande, Union of Comoros (2012-2017)
 
 ```{r, read-in-data-2, echo = FALSE, include = FALSE}
@@ -580,7 +584,7 @@ A total of `r 12 * 6` months of malaria incidence data was collected from the 7 
 
 ```{r Fig-8, echo = FALSE, include = TRUE, fig.height = 9, fig.width = 7,  fig.cap = "Bar chart representation of monthly malaria incidence counts by district across Grande Comore Island spanning Jan. 2012 to Dec. 2017. The black dottet line marks the beginning of MDA (Oct 2013)."}
 # png(filename="Case distribution.jpeg", width=1200, height=1200)
-# tiff("Case distribution.tiff", units="in", width=6, height=7, res=600)
+# tiff("Case distribution.tiff", units="in", width=12, height=7, res=600)
 
 ggplot(dat0, aes(x = Date, y = Cases, fill = Year)) + 
   geom_bar(stat = "identity") + 
@@ -588,10 +592,11 @@ ggplot(dat0, aes(x = Date, y = Cases, fill = Year)) +
   theme(strip.text.y = element_text(angle = 0)) +
   geom_vline(xintercept = as.numeric(dat0$Date[22]), linetype=4, colour="black") +
   scale_x_date(date_breaks = "6 month", date_labels = "%b %Y") +
-  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), text = element_text(size = 10))
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1), text = element_text(size = 15))
 
 # dev.off()
 ```
+
 
 ## Model fitting to the incidence data of Grande Comore Island, Union of Comoros (2012-2017)
 
@@ -800,6 +805,7 @@ ggplot(DatOut1, aes(x = Date, y = `Incidence Rates / 100,000`, group = `Rate Typ
 ```
 
 Overall, the quasi-Poisson model produced a better fit to the observed data, in particular during the pre-treatment period. Based on these results, we settled on a quasi-Poisson model to further analyze and characterize the incidence data for Grande Comore Island to assess the effectiveness of each form of MDA.
+\
 
 ## Analysis of the incidence data and main results
 
@@ -917,6 +923,7 @@ C9_6 <- data.frame(estimate = round(exp(Cb), 5),
 ```
 
 Excluding Centre from the AP treatment group due to its distinct demographics did not significantly change model outcome when compared to the outcome with Centre included (Estimate: `r round(C9_6[, "estimate"], 3)`, 95% CI: `r round(C9_6[, "lower"], 3)`, `r round(C9_6[, "upper"], 3)`, `r C9_6[, "p.value"]`). The incidence rate estimate for 2013 was marginally different for the AP treatment group (`r round(QPtab9$table["AP", "Estimate"] * 100, 2)`%, `r QPtab9$table["AP", "p.value"]`). The pseudoR^2^ (`r round(PseudoR2_QP9[1,1], 3)`) was lower, though, when excluding Centre, while the overdispersion parameter was (`r round(QPtab9$dispersion, 3)`). In general, Centre's demographic did not affect model outcome in terms of pre-treatment incidence rates, suggesting that inclusion of Centre was appropriate here.
+
 
 ## Determining blanket treatment effect on malaria incidence
 
@@ -1120,6 +1127,7 @@ C13_12 <- data.frame(estimate = round(exp(Cb), 5),
 
 The exclusion of Centre from the AP treatment group did not significantly change model outcome (Estimate: `r round(C13_12[, "estimate"], 3)`, 95% CI: `r round(C13_12[, "lower"], 3)`, `r round(C13_12[, "upper"], 3)`, `r C13_12[, "p.value"]`). The incidence rate reduction reflected in 2014 after AP treatment was only marginally different excluding Centre compared to the rate including Centre (`r round(QPtab13$table["AP", "Estimate"] * 100, 2)`% vs `r round(QPtab12$table["AP", "Estimate"] * 100, 2)`%). In general, excluding Centre based on its distinct demographics did not affect model outcome by much, but changed a marginally non-significant difference in post-treatment rates to a statistically significant difference, when compared to the rates after MDA with AP+PMQ~LD~.
 
+
 ### Assessing stability of treatment effictiveness over four years post-treatment
 
 ```{r Mod4-Annual-Incidence-Variability-Post-Treatment, echo = FALSE, include = FALSE}
@@ -1272,6 +1280,7 @@ C10_7 <- data.frame(estimate = round(exp(Cb), 5),
 Excluding Centre here did also not result in significant changes to the outcome of the AP group (`r C10_7[1, "p.value"]`). Thus, the inclusion of Centre was appropriate.
 
 In conclusion, AP only and AP+PMQ~LD~ accomplished similar decreases in malaria incidence rate after only two rounds of MDA on Grande Comore Island. Just as importantly, in the four years following the MDA, malaria incidence remained low, although small increases in incidence rates were observed by 2017, which could have involved various influences on annual malaria transmission. Follow up studies will be required to determine whether continued efforts can keep malaria incidence low in the long run. It must be noted that MDA was not the only intervention method in use during the study period, as distributions of long-lasting insecticidal nets and focal applications of indoor residual spraying were made available by the Comoros National Malaria Control Program before and after MDA. Nevertheless, the use of two rounds of AP only for MDA may be sufficient to dramatically suppress the malaria transmission cycle in settings like Grande Comore Island.
+
 
 # Comparison of the malaria incidence data of Grande Comore Island, Union of Comore, to study outcomes from Anjouan Island, Union of Grande Comore
 
@@ -1429,6 +1438,7 @@ ggplot(DatOut3, aes(x = `Pseudo Time (Months)`, y = `Incidence Rates / 100,000`,
 ### Compare Pre- to Post-Treatment
 
 ```
+
 
 # Analysis of parasite prevalence in children <10 years of age pre- and post-MDA
 
@@ -1669,6 +1679,7 @@ rbind(Tab16$table[2, ],
       column_to_rownames(., var = "rowname"))
 ```
 
+
 ## Analysis of the effect of MDA on gametocyte prevalence
 
 ```{r Parasite-Prevalence-analyzed-by-Microscopy-by-treatment, echo = FALSE, include = FALSE}
@@ -1891,6 +1902,7 @@ rbind(Tab18$table[2, ],
 
 In conclusion, both, AP only and AP+PMQ~LD~ MDA, were equivalently effective in significantly reducing parasitemia prevalence in general as much as the prevalence of gametocytes, the infective stage of *Plasmodium* parasites to naive mosquito vectors, in the blood of children <10 years of age and kept these prevalences significantly low until the end of our measuring period (18 months post-MDA).
 
+
 # Comments about the statistical analysis {-}
 
 ## Declaration of unbiased analysis {-}
@@ -1900,3 +1912,6 @@ All statistical analyses presented here were focused toward answering specific s
 ## Notes about R {-}
 
 The statistical analysis was conducted in RStudio (2022.07.1+554) [@RStudio], using R version 4.2.2 [@Rcore]. The following R packages were required for the execution of the script: AER [@AER], data.table [@data.table], emmeans [@emmeans], ggpubr [@ggpubr], Hmisc [@Hmisc], janitor [@janitor], jtools [@jtools], magrittr [@magrittr], stringr [@stringr], tidyverse [@tidyverse], xlsx [@xlsx]. The appendix was written in Rmarkdown [@rmarkdown] with support of the bookdown [@bookdown] and tinytex [@tinytex] packages for reference implementation.
+
+## Code availability {-}
+The Rmarkdown script file along with the excel data files used for the creation of the statistical appendix are available at GitHub: https://github.com/joedoehl/Malaria-Control-by-Mass-Drug-Administration.git
